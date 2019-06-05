@@ -17,12 +17,16 @@
         <script>
             var mymap;
             var lyrOSM;
+            var mrkCurrentLocation;
             
             $(document).ready(function(){
-                mymap = L.map('mapdiv', {center:[19.4, -99.2], zoom:13,
-                zoomControl:false, dragging:false, minZoom:10, maxZoom:14});
+                mymap = L.map('mapdiv', {center:[19.4, -99.2], zoom:13});
                 lyrOSM = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
                 mymap.addLayer(lyrOSM);
+                
+                setInterval(function() {
+                    mymap.locate();
+                }, 5000)
                 
                 mymap.on('click', function(e){
                     if(e.originalEvent.shiftKey) {
@@ -37,6 +41,26 @@
                     L.marker(e.latlng).addTo(mymap).bindPopup(e.latlng.toString()+"<br>"+
                                                              dtCurrentTime.toString());
                 });
+                
+                mymap.on('keypress', function(e) {
+                    if (e.originalEvent.key=="l") {
+                        mymap.locate();
+                    }
+                });
+                
+                mymap.on('locationfound', function(e) {
+                    console.log(e);
+                    if(mrkCurrentLocation) {
+                        mrkCurrentLocation.remove();
+                    };
+                    mrkCurrentLocation = L.circle(e.latlng, {radius:e.accuracy/2}).addTo(mymap);
+                    mymap.setView(e.latlng, 14);
+                });
+                
+                mymap.on('locationerror', function(e) {
+                    console.log(e);
+                    alert("location was not found")
+                })
             });
         </script>
     </body>
