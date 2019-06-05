@@ -19,9 +19,24 @@
             var lyrOSM;
             
             $(document).ready(function(){
-                mymap = L.map('mapdiv', {center:[19.4, -99.2], zoom:13});
+                mymap = L.map('mapdiv', {center:[19.4, -99.2], zoom:13,
+                zoomControl:false, dragging:false, minZoom:10, maxZoom:14});
                 lyrOSM = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
                 mymap.addLayer(lyrOSM);
+                
+                mymap.on('click', function(e){
+                    if(e.originalEvent.shiftKey) {
+                        alert(mymap.getZoom());
+                    } else {
+                        alert(e.latlng.toString());
+                    }
+                });
+                
+                mymap.on('contextmenu', function(e) {
+                    var dtCurrentTime = new Date();
+                    L.marker(e.latlng).addTo(mymap).bindPopup(e.latlng.toString()+"<br>"+
+                                                             dtCurrentTime.toString());
+                });
             });
         </script>
     </body>
