@@ -12,7 +12,13 @@
         </style>
     </head>
     <body>
-        <div id="side-bar" class="col-md-3"></div>
+        <div id="side-bar" class="col-md-3">
+            <button id='btnLocate' class='btn btn-primary btn-block'>Locate</button>
+            <button id='btnZocalo' class='btn btn-primary btn-block'>ZoomtoZocalo</button>
+            <h4>Zoom Level: <span id='zoom-level'></span></h4>
+            <h4>Map Center: <span id='map-center'></span></h4>
+            <h4>Mouse Location: <span id='mouse-location'></span></h4>
+        </div>
         <div id="mapdiv" class="col-md-9"></div>
         <script>
             var mymap;
@@ -24,9 +30,9 @@
                 lyrOSM = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
                 mymap.addLayer(lyrOSM);
                 
-                setInterval(function() {
+/*                setInterval(function() {
                     mymap.locate();
-                }, 5000)
+                }, 5000)*/
                 
                 mymap.on('click', function(e){
                     if(e.originalEvent.shiftKey) {
@@ -38,8 +44,7 @@
                 
                 mymap.on('contextmenu', function(e) {
                     var dtCurrentTime = new Date();
-                    L.marker(e.latlng).addTo(mymap).bindPopup(e.latlng.toString()+"<br>"+
-                                                             dtCurrentTime.toString());
+                    L.marker(e.latlng).addTo(mymap).bindPopup(e.latlng.toString()+"<br>"+dtCurrentTime.toString());
                 });
                 
                 mymap.on('keypress', function(e) {
@@ -60,8 +65,33 @@
                 mymap.on('locationerror', function(e) {
                     console.log(e);
                     alert("location was not found")
+                });
+                
+                mymap.on('zoomend', function() {
+                    $("#zoom-level").html(mymap.getZoom());
+                });
+                
+                mymap.on('moveend', function() {
+                    $("#map-center").html(LatLngToArrayString(mymap.getCenter()));
+                });
+                
+                mymap.on('mousemove', function(e) {
+                    $("#mouse-location").html(LatLngToArrayString(e.latlng));
+                });
+                
+                $("#btnLocate").click(function(){
+                    mymap.locate();
+                });
+                
+                $("#btnZocalo").click(function(){
+                    mymap.setView([19.43262, -99.13325], 17);
                 })
             });
+            
+            function LatLngToArrayString(ll) {
+                console.log(ll);
+                return "["+ll.lat.toFixed(5)+", "+ll.lsng.toFixed(5)+"]";
+            }
         </script>
     </body>
 </html>
