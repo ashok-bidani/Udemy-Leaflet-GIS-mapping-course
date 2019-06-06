@@ -12,7 +12,7 @@
         </style>
     </head>
     <body>
-        <div id="side-bar">
+        <div id="side-bar" class="col-md-3">
             <button id='btnLocate' class='btn btn-primary btn-block'>Locate</button>
             <button id='btnZocalo' class='btn btn-primary btn-block'>ZoomtoZocalo</button>
             <h4>Zoom Level: <span id='zoom-level'></span></h4>
@@ -25,20 +25,28 @@
             var lyrOSM;
             var mrkCurrentLocation;
             var popZocalo;
+            var ctlZoom;
+            var ctlAttribute;
+            var ctlScale;
             
             $(document).ready(function(){
-                mymap = L.map('mapdiv', {center:[19.4, -99.2], zoom:13});
+                mymap = L.map('mapdiv', {center:[19.4, -99.2], zoom:13, zoomControl:false, attributionContol:false});
                 lyrOSM = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
                 mymap.addLayer(lyrOSM);
+                
+                ctlZoom = L.control.zoom({zoomInText:'In', zoomOutText:'Out', position:'bottomright'});
+                ctlZoom.addTo(mymap);
+                
+                ctlAttribute = L.control.attribution({position:'bottomleft'})
+                ctlAttribute.addTo(mymap);
+                ctlAttribute.addAttribution('OSM');
+                ctlAttribute.addAttribution('<a href="https://github.com/ashok-bidani">Github</a>');
+                
+                ctlScale = L.control.scale({position:'bottomleft'}).addTo(mymap);
                 
                 popZocalo = L.popup({maxWidth:200,keepInView:true});
                 popZocalo.setLatLng([19.43262, -99.13325]);
                 popZocalo.setContent("<h2>Zocalo</h2><img src='img/zocalo.jpg' width='200px'>");
-                
-                popExample=L.popup();
-                popExample.setLatLng([19.4132, -99.1859]);
-                popExample.setContent($("#side-bar")[0]);
-                popExample.openOn(mymap);
                 
                 mymap.on('click', function(e){
                     if(e.originalEvent.shiftKey) {
@@ -78,11 +86,11 @@
                 });
                 
                 mymap.on('moveend', function() {
-                    $("#map-center").html(LatLngToArrayString(mymap.getCenter()));
+                    $("#map-center").html(mymap.getCenter().toString());
                 });
                 
                 mymap.on('mousemove', function(e) {
-                    $("#mouse-location").html(LatLngToArrayString(e.latlng));
+                    $("#mouse-location").html(e.latlng.toString);
                 });
                 
                 $("#btnLocate").click(function(){
@@ -92,15 +100,9 @@
                 $("#btnZocalo").click(function(){
                     mymap.setView([19.43262, -99.13325], 17);
                     mymap.openPopup(popZocalo);
-                })
+                });
             });
             
-            function LatLngToArrayString(ll) {
-                if (ll) {
-                    console.log(ll);
-                    return "["+ll.lat.toFixed(5)+", "+ll.lsng.toFixed(5)+"]"
-                };
-            };
         </script>
     </body>
 </html>
