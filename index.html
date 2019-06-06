@@ -12,7 +12,7 @@
         </style>
     </head>
     <body>
-        <div id="side-bar" class="col-md-3">
+        <div id="side-bar">
             <button id='btnLocate' class='btn btn-primary btn-block'>Locate</button>
             <button id='btnZocalo' class='btn btn-primary btn-block'>ZoomtoZocalo</button>
             <h4>Zoom Level: <span id='zoom-level'></span></h4>
@@ -24,15 +24,21 @@
             var mymap;
             var lyrOSM;
             var mrkCurrentLocation;
+            var popZocalo;
             
             $(document).ready(function(){
                 mymap = L.map('mapdiv', {center:[19.4, -99.2], zoom:13});
                 lyrOSM = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
                 mymap.addLayer(lyrOSM);
                 
-/*                setInterval(function() {
-                    mymap.locate();
-                }, 5000)*/
+                popZocalo = L.popup({maxWidth:200,keepInView:true});
+                popZocalo.setLatLng([19.43262, -99.13325]);
+                popZocalo.setContent("<h2>Zocalo</h2><img src='img/zocalo.jpg' width='200px'>");
+                
+                popExample=L.popup();
+                popExample.setLatLng([19.4132, -99.1859]);
+                popExample.setContent($("#side-bar")[0]);
+                popExample.openOn(mymap);
                 
                 mymap.on('click', function(e){
                     if(e.originalEvent.shiftKey) {
@@ -85,13 +91,16 @@
                 
                 $("#btnZocalo").click(function(){
                     mymap.setView([19.43262, -99.13325], 17);
+                    mymap.openPopup(popZocalo);
                 })
             });
             
             function LatLngToArrayString(ll) {
-                console.log(ll);
-                return "["+ll.lat.toFixed(5)+", "+ll.lsng.toFixed(5)+"]";
-            }
+                if (ll) {
+                    console.log(ll);
+                    return "["+ll.lat.toFixed(5)+", "+ll.lsng.toFixed(5)+"]"
+                };
+            };
         </script>
     </body>
 </html>
