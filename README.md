@@ -1,3 +1,3 @@
 # Display-and-Analyze-GIS-Data-with-Leaflet
 
-Files updated through Lecture 18
+Files updated through Lecture 20
