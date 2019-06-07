@@ -9,12 +9,18 @@
         <link rel="stylesheet" href="src/plugins/L.Control.Zoomslider.css">
         <link rel="stylesheet" href="src/plugins/L.Control.MousePosition.css">
         <link rel="stylesheet" href="src/plugins/Leaflet.PolylineMeasure.css">
+        <link rel="stylesheet" href="src/plugins/easy-button.css">
+        <link rel="stylesheet" href="src/plugins/L.Control.Sidebar.css">
+        <link rel="stylesheet" href="src/plugins/leaflet-opencage/src/css/L.Control.OpenCageSearch.css">
         <script src="src/leaflet-src.js"></script>
         <script src="src/jquery-3.4.1.min.js"></script>
         <script src="src/plugins/L.Control.Pan.js"></script>
         <script src="src/plugins/L.Control.Zoomslider.js"></script>
         <script src="src/plugins/L.Control.MousePosition.js"></script>
         <script src="src/plugins/Leaflet.PolylineMeasure.js"></script>
+        <script src="src/plugins/easy-button.js"></script>
+        <script src="src/plugins/L.Control.Sidebar.js"></script>
+        <script src="src/plugins/leaflet-opencage/src/js/L.Control.OpenCageSearch.js"></script>
         <style>
             #mapdiv {height:100vh;}
         </style>
@@ -27,7 +33,7 @@
             <h4>Map Center: <span id='map-center'></span></h4>
             <h4>Mouse Location: <span id='mouse-location'></span></h4>
         </div>
-        <div id="mapdiv" class="col-md-9"></div>
+        <div id="mapdiv" class="col-md-12"></div>
         <script>
             var mymap;
             var lyrOSM;
@@ -39,6 +45,9 @@
             var ctlZoomslider;
             var ctlMouseposition;
             var ctlMeasure;
+            var ctlEasyButton;
+            var ctlSidebar;
+            var ctlSearch;
             
             $(document).ready(function(){
                 mymap = L.map('mapdiv', {center:[19.4, -99.2], zoom:13, zoomControl:false, attributionContol:false});
@@ -49,7 +58,14 @@
                 /*ctlZoomslider = L.control.zoomslider({position:'topright'}).addTo(mymap);*/
                 
                 ctlMeasure = L.control.polylineMeasure().addTo(mymap);
-                                
+                ctlSidebar = L.control.sidebar('side-bar').addTo(mymap);
+                
+                ctlEasyButton = L.easyButton('glyphicon-transfer', function(){
+                    ctlSidebar.toggle();
+                }).addTo(mymap);
+                
+                ctlSearch = L.Control.openCageSearch({key:'a83040d70b4c4b9dbaba7e874d68b5f8', limit:10}).addTo(mymap);
+                
                 ctlAttribute = L.control.attribution({position:'bottomleft'});
                 ctlAttribute.addTo(mymap);
                 ctlAttribute.addAttribution('OSM');
