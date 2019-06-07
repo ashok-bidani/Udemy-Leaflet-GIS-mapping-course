@@ -5,8 +5,16 @@
         <title>Webmap 201</title>
         <link rel="stylesheet" href="src/leaflet.css">
         <link rel="stylesheet" href="src/css/bootstrap.css">
+        <link rel="stylesheet" href="src/plugins/L.Control.Pan.css">
+        <link rel="stylesheet" href="src/plugins/L.Control.Zoomslider.css">
+        <link rel="stylesheet" href="src/plugins/L.Control.MousePosition.css">
+        <link rel="stylesheet" href="src/plugins/Leaflet.PolylineMeasure.css">
         <script src="src/leaflet-src.js"></script>
         <script src="src/jquery-3.4.1.min.js"></script>
+        <script src="src/plugins/L.Control.Pan.js"></script>
+        <script src="src/plugins/L.Control.Zoomslider.js"></script>
+        <script src="src/plugins/L.Control.MousePosition.js"></script>
+        <script src="src/plugins/Leaflet.PolylineMeasure.js"></script>
         <style>
             #mapdiv {height:100vh;}
         </style>
@@ -25,36 +33,35 @@
             var lyrOSM;
             var mrkCurrentLocation;
             var popZocalo;
-            var ctlZoom;
             var ctlAttribute;
             var ctlScale;
+            var ctlPan;
+            var ctlZoomslider;
+            var ctlMouseposition;
+            var ctlMeasure;
             
             $(document).ready(function(){
                 mymap = L.map('mapdiv', {center:[19.4, -99.2], zoom:13, zoomControl:false, attributionContol:false});
                 lyrOSM = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
                 mymap.addLayer(lyrOSM);
                 
-                ctlZoom = L.control.zoom({zoomInText:'In', zoomOutText:'Out', position:'bottomright'});
-                ctlZoom.addTo(mymap);
+                ctlPan = L.control.pan().addTo(mymap);
+                /*ctlZoomslider = L.control.zoomslider({position:'topright'}).addTo(mymap);*/
                 
-                ctlAttribute = L.control.attribution({position:'bottomleft'})
+                ctlMeasure = L.control.polylineMeasure().addTo(mymap);
+                                
+                ctlAttribute = L.control.attribution({position:'bottomleft'});
                 ctlAttribute.addTo(mymap);
                 ctlAttribute.addAttribution('OSM');
                 ctlAttribute.addAttribution('<a href="https://github.com/ashok-bidani">Github</a>');
                 
-                ctlScale = L.control.scale({position:'bottomleft'}).addTo(mymap);
+                ctlScale = L.control.scale({position:'bottomleft', metric:false, maxWidth:200}).addTo(mymap);
+                
+                ctlMouseposition = L.control.mousePosition().addTo(mymap);
                 
                 popZocalo = L.popup({maxWidth:200,keepInView:true});
                 popZocalo.setLatLng([19.43262, -99.13325]);
                 popZocalo.setContent("<h2>Zocalo</h2><img src='img/zocalo.jpg' width='200px'>");
-                
-                mymap.on('click', function(e){
-                    if(e.originalEvent.shiftKey) {
-                        alert(mymap.getZoom());
-                    } else {
-                        alert(e.latlng.toString());
-                    }
-                });
                 
                 mymap.on('contextmenu', function(e) {
                     var dtCurrentTime = new Date();
