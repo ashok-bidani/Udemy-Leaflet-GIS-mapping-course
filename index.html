@@ -27,9 +27,10 @@
         </style>
     </head>
     <body>
-        <div id="side-bar" class="col-md-3">
+        <div id="side-bar" class="col-md-6">
             <button id='btnLocate' class='btn btn-primary btn-block'>Locate</button>
-            <button id='btnZocalo' class='btn btn-primary btn-block'>ZoomtoZocalo</button>
+            <button id='btnZocalo' class='btn btn-primary btn-block'>Zoom to Zocalo</button>
+            <button id='btnMuseo' class='btn btn-primary btn-block'>Zoom to Anthropology Museum</button>
             <h4>Zoom Level: <span id='zoom-level'></span></h4>
             <h4>Map Center: <span id='map-center'></span></h4>
             <h4>Mouse Location: <span id='mouse-location'></span></h4>
@@ -43,6 +44,7 @@
             var lyrImagery;
             var lyrOutdoors;
             var mrkCurrentLocation;
+            var mrkMuseo;
             var popZocalo;
             var ctlAttribute;
             var ctlScale;
@@ -103,6 +105,9 @@
                 popZocalo.setLatLng([19.43262, -99.13325]);
                 popZocalo.setContent("<h2>Zocalo</h2><img src='img/zocalo.jpg' width='200px'>");
                 
+                mrkMuseo = L.marker([19.42596, -99.1862], {draggable:true}).addTo(mymap);
+                mrkMuseo.bindTooltip("Anthropology Museum");
+                
                 mymap.on('contextmenu', function(e) {
                     var dtCurrentTime = new Date();
                     L.marker(e.latlng).addTo(mymap).bindPopup(e.latlng.toString()+"<br>"+dtCurrentTime.toString());
@@ -140,6 +145,10 @@
                     $("#mouse-location").html(e.latlng.toString());
                 });
                 
+                mrkMuseo.on('dragend', function() {
+                    mrkMuseo.setTooltipContent("Current Location: "+mrkMuseo.getLatLng().toString()+"<br>"+"Distance to Anthropology Museum "+mrkMuseo.getLatLng().distanceTo([19.42596, -99.18620]).toFixed(0)+"m");
+                })
+                
                 $("#btnLocate").click(function(){
                     mymap.locate();
                 });
@@ -147,6 +156,12 @@
                 $("#btnZocalo").click(function(){
                     mymap.setView([19.43262, -99.13325], 17);
                     mymap.openPopup(popZocalo);
+                });
+                
+                $("#btnMuseo").click(function(){
+                    mymap.setView([19.42596, -99.1862], 17);
+                    mrkMuseo.setLatLng([19.42596, -99.1862]);
+                    mrkMuseo.setTooltipContent("Anthropology Museum");
                 });
             });
             
