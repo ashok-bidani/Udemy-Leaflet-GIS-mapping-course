@@ -21,6 +21,7 @@
         <script src="src/plugins/easy-button.js"></script>
         <script src="src/plugins/L.Control.Sidebar.js"></script>
         <script src="src/plugins/leaflet-opencage/src/js/L.Control.OpenCageSearch.js"></script>
+        <script src="src/plugins/leaflet-providers.js"></script>
         <style>
             #mapdiv {height:100vh;}
         </style>
@@ -37,6 +38,10 @@
         <script>
             var mymap;
             var lyrOSM;
+            var lyrWatercolor;
+            var lyrTopo;
+            var lyrImagery;
+            var lyrOutdoors;
             var mrkCurrentLocation;
             var popZocalo;
             var ctlAttribute;
@@ -48,11 +53,30 @@
             var ctlEasyButton;
             var ctlSidebar;
             var ctlSearch;
+            var ctlLayers;
+            var objBasemaps;
+            var objOverlays;
             
             $(document).ready(function(){
                 mymap = L.map('mapdiv', {center:[19.4, -99.2], zoom:13, zoomControl:false, attributionContol:false});
-                lyrOSM = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
+                lyrOSM = L.tileLayer.provider('OpenStreetMap.Mapnik');
+                lyrWatercolor = L.tileLayer.provider('Stamen.Watercolor');
+                lyrTopo= L.tileLayer.provider('OpenTopoMap');
+                lyrImagery = L.tileLayer.provider('Esri.WorldImagery');
+                lyrOutdoors = L.tileLayer.provider('Thunderforest.Outdoors');
                 mymap.addLayer(lyrOSM);
+                
+                objBasemaps = {
+                    "Open Street Maps": lyrOSM,
+                    "Topo Map": lyrTopo,
+                    "Imagery": lyrImagery,
+                    "Outdoors": lyrOutdoors,
+                    "Watercolor": lyrWatercolor
+                };
+                
+                objOverlays = {};
+                
+                ctlLayers = L.control.layers(objBasemaps, objOverlays).addTo(mymap);
                 
                 ctlPan = L.control.pan().addTo(mymap);
                 /*ctlZoomslider = L.control.zoomslider({position:'topright'}).addTo(mymap);*/
