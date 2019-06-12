@@ -125,7 +125,7 @@
                 });
                 ctlDraw.addTo(mymap);
                 
-                let ctlStyle = L.control.styleEditor({position:'topright'}).addTo(mymap);
+                var ctlStyle = L.control.styleEditor({position:'topright'}).addTo(mymap);
                 
                 mymap.on('draw:created', function(e){
                     console.log(e);
