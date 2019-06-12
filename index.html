@@ -6,22 +6,27 @@
         <link rel="stylesheet" href="src/leaflet.css">
         <link rel="stylesheet" href="src/css/bootstrap.css">
         <link rel="stylesheet" href="src/plugins/L.Control.Pan.css">
-        <link rel="stylesheet" href="src/plugins/L.Control.Zoomslider.css">
+        <!--<link rel="stylesheet" href="src/plugins/L.Control.Zoomslider.css">-->
         <link rel="stylesheet" href="src/plugins/L.Control.MousePosition.css">
         <link rel="stylesheet" href="src/plugins/Leaflet.PolylineMeasure.css">
         <link rel="stylesheet" href="src/plugins/easy-button.css">
         <link rel="stylesheet" href="src/plugins/L.Control.Sidebar.css">
         <link rel="stylesheet" href="src/plugins/leaflet-opencage/src/css/L.Control.OpenCageSearch.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css"/>
+        <link rel="stylesheet" href="src/plugins/leaflet-styleeditor/css/Leaflet.StyleEditor.css">
         <script src="src/leaflet-src.js"></script>
         <script src="src/jquery-3.4.1.min.js"></script>
         <script src="src/plugins/L.Control.Pan.js"></script>
-        <script src="src/plugins/L.Control.Zoomslider.js"></script>
+        <!--<script src="src/plugins/L.Control.Zoomslider.js"></script>-->
         <script src="src/plugins/L.Control.MousePosition.js"></script>
         <script src="src/plugins/Leaflet.PolylineMeasure.js"></script>
         <script src="src/plugins/easy-button.js"></script>
         <script src="src/plugins/L.Control.Sidebar.js"></script>
         <script src="src/plugins/leaflet-opencage/src/js/L.Control.OpenCageSearch.js"></script>
         <script src="src/plugins/leaflet-providers.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>  
+        <script src="src/plugins/leaflet-styleeditor/javascript/Leaflet.StyleEditor.js"></script>
+        <script src="src/plugins/leaflet-styleeditor/javascript/StyleForm.js"></script>
         <style>
             #mapdiv {height:100vh;}
         </style>
@@ -45,6 +50,7 @@
             var lyrOutdoors;
             var mrkCurrentLocation;
             var mrkMuseo;
+            var fgpDrawnItems;
             var popZocalo;
             var ctlAttribute;
             var ctlScale;
@@ -56,6 +62,8 @@
             var ctlSidebar;
             var ctlSearch;
             var ctlLayers;
+            var ctlDraw;
+            var ctlStyle;
             var objBasemaps;
             var objOverlays;
             
@@ -68,6 +76,9 @@
                 lyrOutdoors = L.tileLayer.provider('Thunderforest.Outdoors');
                 mymap.addLayer(lyrOSM);
                 
+                mrkMuseo = L.marker([19.42596, -99.1862], {draggable:true}).addTo(mymap);
+                mrkMuseo.bindTooltip("Anthropology Museum");
+                
                 objBasemaps = {
                     "Open Street Maps": lyrOSM,
                     "Topo Map": lyrTopo,
@@ -76,7 +87,10 @@
                     "Watercolor": lyrWatercolor
                 };
                 
-                objOverlays = {};
+                fgpDrawnItems = new L.FeatureGroup();
+                fgpDrawnItems.addTo(mymap);
+                
+                objOverlays = {"Drawn Items":fgpDrawnItems};
                 
                 ctlLayers = L.control.layers(objBasemaps, objOverlays).addTo(mymap);
                 
@@ -101,13 +115,27 @@
                 
                 ctlMouseposition = L.control.mousePosition().addTo(mymap);
                 
+                ctlDraw = new L.Control.Draw({
+                    draw:{
+                        circle:false
+                    },
+                    edit:{
+                        featureGroup:fgpDrawnItems
+                    }
+                });
+                ctlDraw.addTo(mymap);
+                
+                let ctlStyle = L.control.styleEditor({position:'topright'}).addTo(mymap);
+                
+                mymap.on('draw:created', function(e){
+                    console.log(e);
+                    fgpDrawnItems.addLayer(e.layer);
+                });
+                
                 popZocalo = L.popup({maxWidth:200,keepInView:true});
                 popZocalo.setLatLng([19.43262, -99.13325]);
                 popZocalo.setContent("<h2>Zocalo</h2><img src='img/zocalo.jpg' width='200px'>");
-                
-                mrkMuseo = L.marker([19.42596, -99.1862], {draggable:true}).addTo(mymap);
-                mrkMuseo.bindTooltip("Anthropology Museum");
-                
+                            
                 mymap.on('contextmenu', function(e) {
                     var dtCurrentTime = new Date();
                     L.marker(e.latlng).addTo(mymap).bindPopup(e.latlng.toString()+"<br>"+dtCurrentTime.toString());
