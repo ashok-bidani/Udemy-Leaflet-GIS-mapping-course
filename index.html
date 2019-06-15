@@ -52,40 +52,13 @@
             var icnEagleInactive;
             
             $(document).ready(function(){
+                
+                //  ************ Map Initialization **********************************
+                
                 icnEagleActive = L.icon({iconUrl:'img/nest2.png', iconSize:[40,40], iconAnchor:[20,24]});
                 icnEagleInactive = L.icon({iconUrl:'img/nest.png', iconSize:[40,40], iconAnchor:[20,24]});
                 
-                mymap = L.map('mapdiv', {center:[19.4, -99.2], zoom:13, zoomControl:false, attributionContol:false});
-                lyrOSM = L.tileLayer.provider('OpenStreetMap.Mapnik');
-                lyrWatercolor = L.tileLayer.provider('Stamen.Watercolor');
-                lyrTopo= L.tileLayer.provider('OpenTopoMap');
-                lyrImagery = L.tileLayer.provider('Esri.WorldImagery');
-                lyrOutdoors = L.tileLayer.provider('Thunderforest.Outdoors');
-                mymap.addLayer(lyrOSM);
-                
-                objBasemaps = {
-                    "Open Street Maps": lyrOSM,
-                    "Topo Map": lyrTopo,
-                    "Imagery": lyrImagery,
-                    "Outdoors": lyrOutdoors,
-                    "Watercolor": lyrWatercolor
-                };
-                
-                fgpDrawnItems = new L.FeatureGroup();
-                fgpDrawnItems.addTo(mymap);
-                
-                lyrEagleNests = new L.GeoJSON.AJAX(["data/wildlife_eagle.geojson"], {pointToLayer:returnEagleMarker}).addTo(mymap);
-                lyrEagleNests.on('data:loaded', function(){
-                    mymap.fitBounds(lyrEagleNests.getBounds());
-                });
-                
-                lyrRaptorNests = new L.GeoJSON.AJAX('data/wildlife_raptor.geojson', {pointToLayer:returnRaptorMarker});
-                lyrRaptorNests.on('data:loaded', function(){
-                });
-                
-                objOverlays = {"Drawn Items":fgpDrawnItems};
-                
-                ctlLayers = L.control.layers(objBasemaps, objOverlays).addTo(mymap);
+                mymap = L.map('mapdiv', {center:[40.18, -104.83], zoom:11, attributionContol:false});
                 
                 ctlPan = L.control.pan().addTo(mymap);
                 /*ctlZoomslider = L.control.zoomslider({position:'topright'}).addTo(mymap);*/
@@ -103,6 +76,43 @@
                 
                 ctlMouseposition = L.control.mousePosition().addTo(mymap);
                 
+                //  ************ Layer Initialization ******************************
+                
+                lyrOSM = L.tileLayer.provider('OpenStreetMap.Mapnik');
+                lyrWatercolor = L.tileLayer.provider('Stamen.Watercolor');
+                lyrTopo= L.tileLayer.provider('OpenTopoMap');
+                lyrImagery = L.tileLayer.provider('Esri.WorldImagery');
+                lyrOutdoors = L.tileLayer.provider('Thunderforest.Outdoors');
+                mymap.addLayer(lyrOSM);
+                
+                fgpDrawnItems = new L.FeatureGroup();
+                fgpDrawnItems.addTo(mymap);
+                
+                lyrEagleNests = new L.GeoJSON.ajax(["data/wildlife_eagle.geojson"], {pointToLayer:returnEagleMarker}).addTo(mymap);
+                lyrEagleNests.on('data:loaded', function(){
+                    mymap.fitBounds(lyrEagleNests.getBounds());
+                });
+                
+                lyrRaptorNests = new L.GeoJSON.ajax('data/wildlife_raptor.geojson', {pointToLayer:returnRaptorMarker});
+                lyrRaptorNests.on('data:loaded', function(){
+                });
+                
+                //  ************** Setup Layer Control **************************
+                
+                objBasemaps = {
+                    "Open Street Maps": lyrOSM,
+                    "Topo Map": lyrTopo,
+                    "Imagery": lyrImagery,
+                    "Outdoors": lyrOutdoors,
+                    "Watercolor": lyrWatercolor
+                };
+                
+                objOverlays = {"Drawn Items":fgpDrawnItems};
+                
+                ctlLayers = L.control.layers(objBasemaps, objOverlays).addTo(mymap);
+            
+                //  ************* Setup Draw Control ****************************
+                
                 ctlDraw = new L.Control.Draw({
                     draw:{
                         circle:false
@@ -119,7 +129,9 @@
                 });
                 
             });
-                
+            
+            //  **************** Eagle Functions *********************
+            
             function returnEagleMarker(json, latlng){
                 var att = json.properties;
 //                if (att.status=='ACTIVE NEST') {
@@ -135,6 +147,8 @@
                 }
                 return L.marker(latlng, {icon:icnEagle}).bindTooltip("<h4>Eagle Nest: "+att.nest_id+"</h4>");
             };
+            
+            //  **************** Raptor Functions ********************
             
             function returnRaptorMarker(json, latlng){
                 var att = json.properties;
