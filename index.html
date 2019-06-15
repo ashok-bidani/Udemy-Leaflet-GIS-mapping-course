@@ -8,21 +8,22 @@
         <link rel="stylesheet" href="src/plugins/L.Control.Pan.css">
         <link rel="stylesheet" href="src/plugins/L.Control.MousePosition.css">
         <link rel="stylesheet" href="src/plugins/Leaflet.PolylineMeasure.css">
-        <link rel="stylesheet" href="src/plugins/easy-button.css">
         <link rel="stylesheet" href="src/plugins/L.Control.Sidebar.css">
         <link rel="stylesheet" href="src/plugins/leaflet-opencage/src/css/L.Control.OpenCageSearch.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css"/>
+        <link rel="stylesheet" href="src/css/fontawesome.min.css">
+        <link rel="stylesheet" href="src/plugins/leaflet.awesome-markers.css">
         <script src="src/leaflet-src.js"></script>
         <script src="src/jquery-3.4.1.min.js"></script>
         <script src="src/plugins/L.Control.Pan.js"></script>
         <script src="src/plugins/L.Control.MousePosition.js"></script>
         <script src="src/plugins/Leaflet.PolylineMeasure.js"></script>
-        <script src="src/plugins/easy-button.js"></script>
         <script src="src/plugins/L.Control.Sidebar.js"></script>
         <script src="src/plugins/leaflet-opencage/src/js/L.Control.OpenCageSearch.js"></script>
         <script src="src/plugins/leaflet-providers.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>  
-        <script src="src/plugins/leaflet-styleeditor/javascript/StyleForm.js"></script>
+        <script src="src/plugins/ajax.js"></script>
+        <script src="src/plugins/leaflet.awesome-markers.min.js"></script>
         <style>
             #mapdiv {height:100vh;}
         </style>
@@ -47,8 +48,13 @@
             var ctlDraw;
             var objBasemaps;
             var objOverlays;
+            var icnEagleActive;
+            var icnEagleInactive;
             
             $(document).ready(function(){
+                icnEagleActive = L.icon({iconUrl:'img/nest2.png', iconSize:[40,40], iconAnchor:[20,24]});
+                icnEagleInactive = L.icon({iconUrl:'img/nest.png', iconSize:[40,40], iconAnchor:[20,24]});
+                
                 mymap = L.map('mapdiv', {center:[19.4, -99.2], zoom:13, zoomControl:false, attributionContol:false});
                 lyrOSM = L.tileLayer.provider('OpenStreetMap.Mapnik');
                 lyrWatercolor = L.tileLayer.provider('Stamen.Watercolor');
@@ -67,6 +73,15 @@
                 
                 fgpDrawnItems = new L.FeatureGroup();
                 fgpDrawnItems.addTo(mymap);
+                
+                lyrEagleNests = new L.GeoJSON.AJAX(["data/wildlife_eagle.geojson"], {pointToLayer:returnEagleMarker}).addTo(mymap);
+                lyrEagleNests.on('data:loaded', function(){
+                    mymap.fitBounds(lyrEagleNests.getBounds());
+                });
+                
+                lyrRaptorNests = new L.GeoJSON.AJAX('data/wildlife_raptor.geojson', {pointToLayer:returnRaptorMarker});
+                lyrRaptorNests.on('data:loaded', function(){
+                });
                 
                 objOverlays = {"Drawn Items":fgpDrawnItems};
                 
@@ -104,6 +119,49 @@
                 });
                 
             });
+                
+            function returnEagleMarker(json, latlng){
+                var att = json.properties;
+//                if (att.status=='ACTIVE NEST') {
+//                    var clrNest = 'deeppink';
+//                } else {
+//                    var clrNest = 'green';
+//                }
+//                return L.circle(latlng, {radius:804, color:clrNest,fillColor:'green', fillOpacity:0.5}).bindTooltip("<h4>Eagle Nest: "+att.nest_id+"</h4>Status: "+att.status);
+                if (att.status=='ACTIVE NEST') {
+                    var icnEagle = icnEagleActive;
+                } else {
+                    var icnEagle = icnEagleInactive;
+                }
+                return L.marker(latlng, {icon:icnEagle}).bindTooltip("<h4>Eagle Nest: "+att.nest_id+"</h4>");
+            };
+            
+            function returnRaptorMarker(json, latlng){
+                var att = json.properties;
+                switch (att.recentspecies) {
+                    case 'Red-tail Hawk':
+                        var radRaptor = 533;
+                        break;
+                    case 'Swainsons Hawk':
+                        var radRaptor = 400;
+                        break;
+                    default:
+                        var radRaptor = 804;
+                        break;
+                }
+                switch (att.recentstatus) {
+                    case 'ACTIVE NEST':
+                        var optRaptor = {radius:radRaptor, color:'deeppink', fillColor:"blue", fillOpacity:0.5};
+                        break;
+                    case 'INACTIVE NEST':
+                        var optRaptor = {radius:radRaptor, color:'blue', fillColor:'blue', fillOpacity:0.5};
+                        break;
+                    case 'FLEDGED NEST':
+                        var optRaptor = {radius:radRaptor, color:'deeppink', fillColor:"blue", fillOpacity:0.5, dashArray:"2,8"};
+                        break;
+                }
+                return L.circle(latlng, optRaptor).bindPopup("<h4>Raptor Nest: "+att.Nest_ID+"</h4>Status: "+att.recentstatus+"<br>Species: "+att.recentspecies+"<br>Last Survey: "+att.lastsurvey);
+            };
             
         </script>
     </body>
