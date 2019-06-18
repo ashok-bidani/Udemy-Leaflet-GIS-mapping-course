@@ -88,12 +88,12 @@
                 fgpDrawnItems = new L.FeatureGroup();
                 fgpDrawnItems.addTo(mymap);
                 
-                lyrEagleNests = L.geoJSON.ajax(["data/wildlife_eagle.geojson"], {pointToLayer:returnEagleMarker}).addTo(mymap);
+                lyrEagleNests = L.geoJSON(["data/wildlife_eagle.geojson"], {pointToLayer:returnEagleMarker}).addTo(mymap);
                 lyrEagleNests.on('data:loaded', function(){
                     mymap.fitBounds(lyrEagleNests.getBounds());
                 });
                 
-                lyrRaptorNests = L.geoJSON.ajax('data/wildlife_raptor.geojson', {pointToLayer:returnRaptorMarker});
+                lyrRaptorNests = L.geoJSON('data/wildlife_raptor.geojson', {pointToLayer:returnRaptorMarker});
                 lyrRaptorNests.on('data:loaded', function(){
                 });
                 
